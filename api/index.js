@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 3001;
 
 // Import routes
 
-
 const app = express();
 
 // Connect to MongoDB
