@@ -11,7 +11,7 @@ const Header = () => {
             <MdGolfCourse /> GolfClub <span className='text-2xl font-light text-gray-600'>Fitting</span>
             </h1>
             <Link to="/login" className='text-md text-gray-900 hover:text-gray-700 hover:underline'>
-                Get Started
+                Login
             </Link>
         </div>
     </header>

@@ -17,6 +17,13 @@ import { MdTimeline } from "react-icons/md";
 import { MdGolfCourse } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import UserContext from '../context/UserContext';
+import Dashboard from '../components/Dashboard';
+import ScheduleFitting from '../components/ScheduleFitting';
+import FittingProgress from '../components/FittingProgress';
+import AccountHistory from '../components/AccountHistory';
+import MyProfile from '../components/MyProfile';
+import ScheduleSwingAnalysis from '../components/ScheduleSwingAnalysis';
+import GetStarted from '../components/GetStarted';
 
 const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
   <button 
@@ -42,6 +49,8 @@ const Admin = () => {
   const [viewFittingAccountHistory, setViewFittingAccountHistory] = useState(false);
   const [viewFittingMyProfile, setViewFittingMyProfile] = useState(false);
   const [viewFittingSettings, setViewFittingSettings] = useState(false);
+  const [viewScheduleSwingAnalysis, setViewScheduleSwingAnalysis] = useState(false);
+  const [viewGettingStarted, setViewGettingStarted] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -51,11 +60,12 @@ const Admin = () => {
   const handleMenuItemClick = (item) => {
     setActiveItem(item.label);
     setViewHome(item.label === 'Home');
+    setViewGettingStarted(item.label === 'Getting Started');
+    setViewScheduleSwingAnalysis(item.label === 'Schedule a Swing Analysis');
     setViewScheduleFitting(item.label === 'Schedule a Fitting');
     setViewFittingProgress(item.label === 'Fitting Progress');
     setViewFittingAccountHistory(item.label === 'Account History');
     setViewFittingMyProfile(item.label === 'My Profile');
-    setViewFittingSettings(item.label === 'Settings');
   };
 
   return (
@@ -64,7 +74,7 @@ const Admin = () => {
       <div className={`${isSidebarOpen ? 'w-1/5' : 'w-20'} bg-white h-full border-r border-gray-100`}>
         <div className="p-4 px-10 flex items-center justify-between border-b">
           <div className={`flex items-center ${!isSidebarOpen && 'hidden'}`}>
-            <MdGolfCourse className="w-7 h-7 text-gray-900 mr-2" />
+            <MdGolfCourse className="w-7 h-7 text-blue-700 mr-2" />
             <h1 className="font-semibold text-lg">GolfClub Fitting</h1>
           </div>
         </div>
@@ -72,12 +82,12 @@ const Admin = () => {
         <nav className="pl-10 font-semibold mt-6">
           {[
             { icon: RiDashboardLine, label: 'Home' },
+            { icon: RiSettings2Line, label: 'Getting Started' },
             { icon: RiCalendarEventLine, label: 'Schedule a Swing Analysis' },
             { icon: GrScheduleNew, label: 'Schedule a Fitting' },
             { icon: MdTimeline, label: 'Fitting Progress' },
             { icon: LuFileText, label: 'Account History' },
             { icon: RiUser3Line, label: 'My Profile' },
-            { icon: RiSettings2Line, label: 'Settings' },
           ].map((item) => (
             <MenuItem
               key={item.label}
@@ -106,7 +116,27 @@ const Admin = () => {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-6">
-          
+        {viewHome ? (
+            <Dashboard />
+          ) : viewGettingStarted ? (
+            <GetStarted />
+          ) : viewScheduleSwingAnalysis ? (
+            <ScheduleSwingAnalysis />
+          ) : viewScheduleFitting ? (
+            <ScheduleFitting />
+          ) : viewFittingProgress ? (
+            <FittingProgress />
+          ) : viewFittingAccountHistory ? (
+            <AccountHistory />
+          ) : viewFittingMyProfile ? (
+            <MyProfile />
+          ) : (
+            <>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Get Started</h2>
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>
