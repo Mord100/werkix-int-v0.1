@@ -8,9 +8,18 @@ const fittingSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['Swing Analysis', 'Club Fitting'],
+    enum: ['swing-analysis', 'club-fitting'],
     required: true
   },
+  scheduledDate: {
+    type: Date,
+    required: true
+  },
+  time: {
+    type: String,
+    trim: true
+  },
+  comments: String,
   status: {
     type: String,
     enum: [
@@ -22,11 +31,6 @@ const fittingSchema = new mongoose.Schema({
     ],
     default: 'Fitting Request Submitted'
   },
-  scheduledDate: {
-    type: Date,
-    required: true
-  },
-  comments: String,
   statusHistory: [{
     status: {
       type: String,
@@ -38,26 +42,21 @@ const fittingSchema = new mongoose.Schema({
         'Fitting Completed'
       ]
     },
-    timestamp: {
-      type: Date,
-      default: Date.now
-    },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
     }
   }],
   measurements: {
-    swingSpeed: Number,
-    launchAngle: Number,
-    spinRate: Number,
-    clubRecommendations: [String]
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
   }
 }, {
   timestamps: true
 });
 
-fittingSchema.index({ customer: 1, scheduledDate: 1 });
-
-const Fitting = mongoose.model('Fitting', fittingSchema);
-module.exports = Fitting;
+module.exports = mongoose.model('Fitting', fittingSchema);

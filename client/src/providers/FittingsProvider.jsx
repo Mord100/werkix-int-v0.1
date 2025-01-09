@@ -113,7 +113,7 @@ const FittingsProvider = ({ children }) => {
   const scheduleFitting = async (scheduleData) => {
     setLoading(true);
     try {
-      const response = await api.post('/fittings/schedule', scheduleData);
+      const response = await api.post('/fittings/request', scheduleData);
       toast.success('Fitting scheduled successfully');
       return response.data;
     } catch (error) {

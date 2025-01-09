@@ -11,6 +11,8 @@ import {
 import { LuFileText } from "react-icons/lu";
 import { GrScheduleNew } from "react-icons/gr";
 import { MdTimeline } from "react-icons/md";
+import { VscDebugStart } from "react-icons/vsc";
+
 
 
 
@@ -24,6 +26,7 @@ import AccountHistory from '../components/AccountHistory';
 import MyProfile from '../components/MyProfile';
 import ScheduleSwingAnalysis from '../components/ScheduleSwingAnalysis';
 import GetStarted from '../components/GetStarted';
+import AdBanner from '../components/AdBanner';
 
 const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
   <button 
@@ -79,10 +82,10 @@ const Admin = () => {
           </div>
         </div>
 
-        <nav className="pl-10 font-semibold mt-6">
+        <nav className="pl-10 text-sm font-semibold mt-6">
           {[
             { icon: RiDashboardLine, label: 'Home' },
-            { icon: RiSettings2Line, label: 'Getting Started' },
+            { icon: VscDebugStart, label: 'Getting Started' },
             { icon: RiCalendarEventLine, label: 'Schedule a Swing Analysis' },
             { icon: GrScheduleNew, label: 'Schedule a Fitting' },
             { icon: MdTimeline, label: 'Fitting Progress' },
@@ -103,7 +106,8 @@ const Admin = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Navigation */}
         <header className="bg-white border-b border-gray-100">
-          <div className="flex items-center pr-10 justify-end px-6 py-4">
+             
+          <div className="flex items-center border-b pr-10 justify-end px-6 py-4">
             <button 
               onClick={handleLogout}
               className="flex items-center text-gray-800 hover:underline hover:text-gray-900"
@@ -112,6 +116,9 @@ const Admin = () => {
               <span className="text-md">Logout</span>
             </button>
           </div>
+          <div className="">
+                <AdBanner />
+            </div>
         </header>
 
         {/* Main Content Area */}
@@ -132,9 +139,7 @@ const Admin = () => {
             <MyProfile />
           ) : (
             <>
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Get Started</h2>
-              </div>
+              <Dashboard />
             </>
           )}
         </main>

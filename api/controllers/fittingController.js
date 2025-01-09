@@ -3,17 +3,31 @@ const Schedule = require('../models/Schedule');
 const asyncHandler = require('../utils/asyncHandler');
 
 exports.createFittingRequest = asyncHandler(async (req, res) => {
-  const { type, scheduledDate, comments } = req.body;
+  const { 
+    type, 
+    date: scheduledDate, 
+    comments, 
+    time, 
+    clubType 
+  } = req.body;
   
+  if (type === 'club-fitting' && (!time || !clubType)) {
+    return res.status(400).json({ 
+      message: 'Time and club type are required for a club fitting request' 
+    });
+  }
+
   const fitting = await Fitting.create({
     customer: req.user._id,
     type,
-    scheduledDate,
+    scheduledDate: new Date(scheduledDate),
     comments,
+    time, 
     statusHistory: [{
       status: 'Fitting Request Submitted',
       updatedBy: req.user._id
-    }]
+    }],
+    measurements: type === 'club-fitting' ? { clubType } : {}
   });
 
   res.status(201).json(fitting);
@@ -62,16 +76,32 @@ exports.getFittingById = asyncHandler(async (req, res) => {
 });
 
 exports.updateFitting = asyncHandler(async (req, res) => {
-  const { type, scheduledDate, comments } = req.body;
+  const { 
+    type, 
+    date: scheduledDate, 
+    comments, 
+    time, 
+    clubType 
+  } = req.body;
+  
   const fitting = await Fitting.findById(req.params.id);
   
   if (!fitting) {
     return res.status(404).json({ message: 'Fitting not found' });
   }
 
+  // Update fields
   fitting.type = type;
-  fitting.scheduledDate = scheduledDate;
+  fitting.scheduledDate = new Date(scheduledDate);
   fitting.comments = comments;
+  fitting.time = time;
+  
+  // Update measurements for club fitting
+  if (type === 'club-fitting') {
+    fitting.measurements = { clubType };
+  } else {
+    fitting.measurements = {};
+  }
 
   await fitting.save();
   res.json(fitting);

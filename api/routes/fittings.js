@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
+const { body, check, validationResult } = require('express-validator');
 const authMiddleware = require('../middleware/auth');
 const fittingController = require('../controllers/fittingController');
 
@@ -12,48 +12,71 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
-router.post('/request',
-  authMiddleware,
-  [
-    check('type').isIn(['Swing Analysis', 'Club Fitting']),
-    check('scheduledDate').isDate(),
-    check('comments').optional().isString()
-  ],
-  validateRequest,
-  fittingController.createFittingRequest
-);
-
-router.get('/my-fittings', authMiddleware, fittingController.getUserFittings);
-
-router.get('/all', 
-  authMiddleware, 
-  authMiddleware.isAdmin, 
-  fittingController.getAllFittings
-);
-
-router.put('/:id/status',
-  authMiddleware,
-  authMiddleware.isAdmin,
-  [
-    check('status').isIn([
-      'Fitting Request Submitted',
-      'Fitting being Prepped',
-      'Fitting Scheduled',
-      'Fitting Canceled',
-      'Fitting Completed'
-    ])
-  ],
-  validateRequest,
-  fittingController.updateFittingStatus
-);
-
-router.get('/:id', authMiddleware, fittingController.getFittingById);
+const isValidDate = (value) => {
+  if (!value) {
+    throw new Error('Date is required');
+  }
+  
+  const date = new Date(value);
+  
+  if (isNaN(date.getTime()) || date < new Date()) {
+    throw new Error('Invalid date');
+  }
+  
+  return true;
+};
 
 router.put('/:id',
   authMiddleware,
   authMiddleware.isAdmin,
   [
-    check('type').isIn(['Swing Analysis', 'Club Fitting']),
+    check('type').isIn(['swing-analysis', 'club-fitting']),
+    body('date').custom(isValidDate),
+    check('comments').optional().isString(),
+    check('time').optional().isString(),
+    check('clubType').optional().isString()
+  ],
+  validateRequest,
+  fittingController.updateFitting
+);
+
+router.post('/request',
+    authMiddleware,
+    [
+      check('type').isIn(['swing-analysis', 'club-fitting']),
+      body('date').custom(isValidDate),
+      check('comments').optional().isString(),
+      check('time').optional().isString(),
+      check('clubType').optional().isString()
+    ],
+    validateRequest,
+    fittingController.createFittingRequest
+  );
+  
+  router.put('/:id',
+    authMiddleware,
+    authMiddleware.isAdmin,
+    [
+      check('type').isIn(['swing-analysis', 'club-fitting']),
+      body('date').custom(isValidDate),
+      check('comments').optional().isString(),
+      check('time').optional().isString(),
+      check('clubType').optional().isString()
+    ],
+    validateRequest,
+    fittingController.updateFitting
+  );
+
+router.get('/:id', 
+  authMiddleware, 
+  fittingController.getFittingById
+);
+
+router.put('/:id',
+  authMiddleware,
+  authMiddleware.isAdmin,
+  [
+    check('type').isIn(['swing-analysis', 'club-fitting']),
     check('scheduledDate').isDate(),
     check('comments').optional().isString()
   ],
