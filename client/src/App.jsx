@@ -1,10 +1,20 @@
-import { useState } from 'react'
-import './App.css'
+import ProviderController from "./providers/ProviderController";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { useCookies } from 'react-cookie';
+
+const PrivateRoute = ({ element }) => {
+  const [cookies] = useCookies(['token']);
+  return cookies.token ? element : <Navigate to="/" />;
+};
 
 export default function App() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <ProviderController>
+      <Router>
+        <Routes>
+
+        </Routes>
+      </Router>
+    </ProviderController>
   )
 }
