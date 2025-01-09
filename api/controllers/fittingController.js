@@ -27,6 +27,12 @@ exports.getUserFittings = asyncHandler(async (req, res) => {
   res.json(fittings);
 });
 
+exports.getAllFittings = asyncHandler(async (req, res) => {
+  const fittings = await Fitting.find().sort('-scheduledDate');
+
+  res.json(fittings);
+});
+
 exports.updateFittingStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const fitting = await Fitting.findById(req.params.id);
@@ -40,6 +46,32 @@ exports.updateFittingStatus = asyncHandler(async (req, res) => {
     status,
     updatedBy: req.user._id
   });
+
+  await fitting.save();
+  res.json(fitting);
+});
+
+exports.getFittingById = asyncHandler(async (req, res) => {
+  const fitting = await Fitting.findById(req.params.id).populate('customer', 'profile.firstName profile.lastName');
+
+  if (!fitting) {
+    return res.status(404).json({ message: 'Fitting not found' });
+  }
+
+  res.json(fitting);
+});
+
+exports.updateFitting = asyncHandler(async (req, res) => {
+  const { type, scheduledDate, comments } = req.body;
+  const fitting = await Fitting.findById(req.params.id);
+  
+  if (!fitting) {
+    return res.status(404).json({ message: 'Fitting not found' });
+  }
+
+  fitting.type = type;
+  fitting.scheduledDate = scheduledDate;
+  fitting.comments = comments;
 
   await fitting.save();
   res.json(fitting);

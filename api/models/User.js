@@ -2,12 +2,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
   email: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
   },
   password: {
     type: String,
@@ -20,9 +26,9 @@ const userSchema = new mongoose.Schema({
     default: 'consumer'
   },
   profile: {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    phone: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
+    phone: { type: String },
     address: {
       street: String,
       city: String,
@@ -31,8 +37,7 @@ const userSchema = new mongoose.Schema({
     },
     golfClubSize: {
       type: String,
-      enum: ['Standard', 'One Inch Short', 'One Inch Long', 'Custom'],
-      default: 'Standard'
+      enum: ['Standard', 'One Inch Short', 'One Inch Long', 'Custom']
     }
   },
   createdAt: {
@@ -45,11 +50,17 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new)
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
+
+// Method to compare password
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 userSchema.index({ email: 1 });
 
