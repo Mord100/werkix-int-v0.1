@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import UserContext from '../context/UserContext';
+import { toast } from 'react-hot-toast';
 
 export const useUser = () => useContext(UserContext);
 
@@ -38,20 +39,27 @@ const UserProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:3000/api/user/login', { email, password });
-      setUser(response.data.user); 
-      setCookie('token', response.data.token); 
-      return response.data; 
+      
+      // Set token and role in cookies
+      setCookie('token', response.data.token, { path: '/' });
+      setCookie('role', response.data.user.role, { path: '/' });
+      
+      setUser(response.data.user);
+      toast.success('Login successful');
+      
+      return response.data; // Return full response for role-based navigation
     } catch (error) {
-      console.error('Login failed:', error.response.data.message);
-      throw error; 
+      toast.error(error.response?.data?.message || 'Login failed');
+      throw error;
     } finally {
       setLoading(false);
     }
   };
-
+  
   const logout = () => {
-    setUser(null); 
-    removeCookie('token'); 
+    removeCookie('token', { path: '/' });
+    removeCookie('role', { path: '/' });
+    setUser(null);
   };
 
   return (
