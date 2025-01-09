@@ -1,34 +1,27 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import UserContext from '../context/UserContext';
 import { RiArrowLeftSLine } from 'react-icons/ri';
+import UserContext from '../context/UserContext';
 
-const Login = () => {
+const SignUp = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
   const navigate = useNavigate();
-  const { login } = useContext(UserContext);
+  const { createUser } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
-      const response = await login(email, password);
+      await createUser(name, email, password, 'consumer');
       
-      // Navigate based on user role
-      if (response.user.role === 'admin') {
-        navigate('/admin-layout');
-      } else if (response.user.role === 'consumer') {
-        navigate('/consumer-layout');
-      } else {
-        // Fallback route if role is unexpected
-        navigate('/');
-        toast.error('Unknown user role');
-      }
+      // Redirect to login page after successful signup
+      navigate('/login');
     } catch (error) {
-      // Error handling is already done in the login function
-      toast.error('Login failed');
+      // Error handling is done in the createUser method via toast
+      console.error('Signup error:', error);
     }
   };
 
@@ -43,18 +36,30 @@ const Login = () => {
       </button>
       <div className="w-[50%] p-8 bg-white rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold mb-2 text-center text-gray-800">
-          Login
+          Create an Account
         </h2>
         <p className="text-center text-gray-600 mb-4">
-          Please enter your email and password to access the dashboard.
+          Please fill out the form to register
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Enter full name"
+              required
+            />
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
             <input
               id="email"
               type="email"
-              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
@@ -68,12 +73,12 @@ const Login = () => {
             <input
               id="password"
               type="password"
-              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Enter password"
               required
+              minLength="6"
             />
           </div>
 
@@ -82,18 +87,19 @@ const Login = () => {
               type="submit"
               className="w-full bg-blue-600 text-white py-3 px-6 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >
-              Login
+              Create Account
             </button>
           </div>
+
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account? {' '}
+              Already have an account? {' '}
               <button 
                 type="button"
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/login')}
                 className="text-blue-600 hover:underline"
               >
-                Signup
+                Login
               </button>
             </p>
           </div>
@@ -103,4 +109,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

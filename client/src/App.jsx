@@ -6,6 +6,7 @@ import AdminLayout from "./layouts/adminLayout";
 import ProviderController from "./providers/ProviderController";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useCookies } from 'react-cookie';
+import SignUp from './pages/SignUp';
 
 const PrivateRoute = ({ element, role }) => {
   const [cookies] = useCookies(['token', 'role']);
@@ -19,6 +20,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp/>} />
           <Route 
             path="/consumer-layout" 
             element={<PrivateRoute element={<ConsumerLayout />} role="consumer" />} 
