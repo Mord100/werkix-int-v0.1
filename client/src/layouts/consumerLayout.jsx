@@ -105,8 +105,7 @@ const Admin = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Navigation */}
-        <header className="bg-white border-b border-gray-100">
-             
+        <header className="bg-white border-b border-gray-100">    
           <div className="flex items-center border-b pr-10 justify-end px-6 py-4">
             <button 
               onClick={handleLogout}

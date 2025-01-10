@@ -78,7 +78,7 @@ const ScheduleFitting = () => {
 
   return (
     <div className="max-w-7xl my-5 mx-6 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+      <h2 className="text-2xl font-bold border-b pb-4 mb-6 text-gray-800 flex items-center">
         {/* <RiGolfLine className="mr-3 text-blue-600" /> */}
         Schedule Club Fitting
       </h2>

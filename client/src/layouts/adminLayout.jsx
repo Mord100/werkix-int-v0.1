@@ -11,9 +11,22 @@ import {
 import { LuFileText } from "react-icons/lu";
 import { GrScheduleNew } from "react-icons/gr";
 import { MdTimeline } from "react-icons/md";
+import { VscDebugStart } from "react-icons/vsc";
+
+
+
+
 import { MdGolfCourse } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 import UserContext from '../context/UserContext';
+import Dashboard from '../components/Dashboard';
+import ScheduleFitting from '../components/ScheduleFitting';
+import FittingProgress from '../components/FittingProgress';
+import AccountHistory from '../components/AccountHistory';
+import MyProfile from '../components/MyProfile';
+import ScheduleSwingAnalysis from '../components/ScheduleSwingAnalysis';
+import GetStartedMessage from '../components/admin/GettingStartedMessage';
+import AdBanner from '../components/AdBanner';
 
 const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
   <button 
@@ -28,6 +41,7 @@ const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
 );
 
 
+
 const Admin = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('Dashboard');
@@ -38,6 +52,8 @@ const Admin = () => {
   const [viewFittingAccountHistory, setViewFittingAccountHistory] = useState(false);
   const [viewFittingMyProfile, setViewFittingMyProfile] = useState(false);
   const [viewFittingSettings, setViewFittingSettings] = useState(false);
+  const [viewScheduleSwingAnalysis, setViewScheduleSwingAnalysis] = useState(false);
+  const [viewGettingStarted, setViewGettingStarted] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -47,11 +63,12 @@ const Admin = () => {
   const handleMenuItemClick = (item) => {
     setActiveItem(item.label);
     setViewHome(item.label === 'Home');
-    setViewScheduleFitting(item.label === 'Schedule a Fitting');
-    setViewFittingProgress(item.label === 'Fitting Progress');
-    setViewFittingAccountHistory(item.label === 'Account History');
-    setViewFittingMyProfile(item.label === 'My Profile');
-    setViewFittingSettings(item.label === 'Settings');
+    setViewGettingStarted(item.label === 'Getting Started Message');
+    setViewScheduleSwingAnalysis(item.label === 'Fitting Requests');
+    setViewScheduleFitting(item.label === 'Fitting Tasks');
+    setViewFittingProgress(item.label === 'Fitting Schedule');
+    setViewFittingAccountHistory(item.label === 'Fitting History');
+    setViewFittingMyProfile(item.label === 'Customer Profiles');
   };
 
   return (
@@ -61,19 +78,19 @@ const Admin = () => {
         <div className="p-4 px-10 flex items-center justify-between border-b">
           <div className={`flex items-center ${!isSidebarOpen && 'hidden'}`}>
             <MdGolfCourse className="w-7 h-7 text-blue-700 mr-2" />
-            <h1 className="font-semibold text-lg">Admin</h1>
+            <h1 className="font-semibold text-lg">Admin Portal</h1>
           </div>
         </div>
 
-        <nav className="pl-10 font-semibold mt-6">
+        <nav className="pl-10 text-sm font-semibold mt-6">
           {[
             { icon: RiDashboardLine, label: 'Home' },
-            { icon: RiCalendarEventLine, label: 'Schedule a Swing Analysis' },
-            { icon: GrScheduleNew, label: 'Schedule a Fitting' },
-            { icon: MdTimeline, label: 'Fitting Progress' },
-            { icon: LuFileText, label: 'Account History' },
-            { icon: RiUser3Line, label: 'My Profile' },
-            { icon: RiSettings2Line, label: 'Settings' },
+            { icon: VscDebugStart, label: 'Getting Started Message' },
+            { icon: RiCalendarEventLine, label: 'Fitting Requests' },
+            { icon: GrScheduleNew, label: 'Fitting Tasks' },
+            { icon: MdTimeline, label: 'Fitting Schedule' },
+            { icon: LuFileText, label: 'Fitting History' },
+            { icon: RiUser3Line, label: 'Customer Profiles' },
           ].map((item) => (
             <MenuItem
               key={item.label}
@@ -88,8 +105,8 @@ const Admin = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Navigation */}
-        <header className="bg-white border-b border-gray-100">
-          <div className="flex items-center pr-10 justify-end px-6 py-4">
+        <header className="bg-white border-b border-gray-100">    
+          <div className="flex items-center border-b pr-10 justify-end px-6 py-4">
             <button 
               onClick={handleLogout}
               className="flex items-center text-gray-800 hover:underline hover:text-gray-900"
@@ -98,11 +115,32 @@ const Admin = () => {
               <span className="text-md">Logout</span>
             </button>
           </div>
+          <div className="">
+                <AdBanner />
+            </div>
         </header>
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-6">
-          
+        {viewHome ? (
+            <Dashboard />
+          ) : viewGettingStarted ? (
+            <GetStartedMessage />
+          ) : viewScheduleSwingAnalysis ? (
+            <ScheduleSwingAnalysis />
+          ) : viewScheduleFitting ? (
+            <ScheduleFitting />
+          ) : viewFittingProgress ? (
+            <FittingProgress />
+          ) : viewFittingAccountHistory ? (
+            <AccountHistory />
+          ) : viewFittingMyProfile ? (
+            <MyProfile />
+          ) : (
+            <>
+              <Dashboard />
+            </>
+          )}
         </main>
       </div>
     </div>
