@@ -24,8 +24,8 @@ import ScheduleFitting from '../components/ScheduleFitting';
 import FittingProgress from '../components/FittingProgress';
 import AccountHistory from '../components/AccountHistory';
 import MyProfile from '../components/MyProfile';
-import ScheduleSwingAnalysis from '../components/ScheduleSwingAnalysis';
 import GetStartedMessage from '../components/admin/GettingStartedMessage';
+import FittingRequests from '../components/admin/FittingRequests';
 import AdBanner from '../components/AdBanner';
 
 const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
@@ -127,7 +127,7 @@ const Admin = () => {
           ) : viewGettingStarted ? (
             <GetStartedMessage />
           ) : viewScheduleSwingAnalysis ? (
-            <ScheduleSwingAnalysis />
+            <FittingRequests />
           ) : viewScheduleFitting ? (
             <ScheduleFitting />
           ) : viewFittingProgress ? (

@@ -1,9 +1,10 @@
 import React from 'react';
+import { Toaster } from 'react-hot-toast';
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ConsumerLayout from "./layouts/consumerLayout";
 import AdminLayout from "./layouts/adminLayout";
-import ProviderController from "./providers/ProviderController";
+import ProviderController from "./providers/ProviderController"
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useCookies } from 'react-cookie';
 import SignUp from './pages/SignUp';
@@ -16,6 +17,7 @@ const PrivateRoute = ({ element, role }) => {
 export default function App() {
   return (
     <ProviderController>
+      <Toaster position="top-right" reverseOrder={false} />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
