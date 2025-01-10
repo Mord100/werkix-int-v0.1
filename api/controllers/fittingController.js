@@ -34,7 +34,16 @@ exports.createFittingRequest = asyncHandler(async (req, res) => {
 });
 
 exports.getUserFittings = asyncHandler(async (req, res) => {
-  const fittings = await Fitting.find({ customer: req.user._id })
+  const { type } = req.query;
+
+  const query = { customer: req.user._id };
+  
+  // Add type filter if provided
+  if (type) {
+    query.type = type;
+  }
+
+  const fittings = await Fitting.find(query)
     .sort('-scheduledDate')
     .populate('customer', 'profile.firstName profile.lastName');
     
@@ -66,7 +75,14 @@ exports.updateFittingStatus = asyncHandler(async (req, res) => {
 });
 
 exports.getFittingById = asyncHandler(async (req, res) => {
-  const fitting = await Fitting.findById(req.params.id).populate('customer', 'profile.firstName profile.lastName');
+  const { id } = req.params;
+
+  // Validate the ID format
+  if (!id || id === 'all' || id === 'my-fittings') {
+    return res.status(400).json({ message: 'Invalid fitting ID' });
+  }
+
+  const fitting = await Fitting.findById(id).populate('customer', 'profile.firstName profile.lastName');
 
   if (!fitting) {
     return res.status(404).json({ message: 'Fitting not found' });
@@ -102,6 +118,44 @@ exports.updateFitting = asyncHandler(async (req, res) => {
   } else {
     fitting.measurements = {};
   }
+
+  await fitting.save();
+  res.json(fitting);
+});
+
+// Update swing analysis measurements
+exports.updateFittingMeasurements = asyncHandler(async (req, res) => {
+  const { measurements } = req.body;
+  const fitting = await Fitting.findById(req.params.id);
+  
+  if (!fitting) {
+    return res.status(404).json({ message: 'Fitting not found' });
+  }
+
+  // Verify it's a swing analysis
+  if (fitting.type !== 'swing-analysis') {
+    return res.status(400).json({ message: 'Not a swing analysis fitting' });
+  }
+
+  fitting.measurements = measurements;
+  await fitting.save();
+  
+  res.json(fitting);
+});
+
+// Cancel a fitting
+exports.cancelFitting = asyncHandler(async (req, res) => {
+  const fitting = await Fitting.findById(req.params.id);
+  
+  if (!fitting) {
+    return res.status(404).json({ message: 'Fitting not found' });
+  }
+
+  fitting.status = 'Fitting Canceled';
+  fitting.statusHistory.push({
+    status: 'Fitting Canceled',
+    updatedBy: req.user._id
+  });
 
   await fitting.save();
   res.json(fitting);

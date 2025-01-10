@@ -22,7 +22,7 @@ router.post('/book',
   [
     check('date').isISO8601().toDate(),
     check('timeSlotId').isMongoId(),
-    check('serviceType').isIn(['Swing Analysis', 'Club Fitting'])
+    check('serviceType').isIn(['swing-analysis', 'club-fitting'])
   ],
   validateRequest,
   scheduleController.bookAppointment

@@ -84,4 +84,16 @@ router.put('/:id',
   fittingController.updateFitting
 );
 
+// Get a specific swing analysis by ID
+router.get('/:id', authMiddleware, fittingController.getFittingById);
+
+// Update swing analysis measurements
+router.put('/:id/measurements', authMiddleware, fittingController.updateFittingMeasurements);
+
+// Cancel a swing analysis
+router.put('/:id/cancel', authMiddleware, fittingController.cancelFitting);
+
+// Get user's fittings with optional type filter
+router.get('/', authMiddleware, fittingController.getUserFittings);
+
 module.exports = router;
