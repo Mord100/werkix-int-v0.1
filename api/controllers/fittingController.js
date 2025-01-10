@@ -38,12 +38,19 @@ exports.getUserFittings = asyncHandler(async (req, res) => {
 
   const query = { customer: req.user._id };
   
-  // Add type filter if provided
   if (type) {
     query.type = type;
   }
 
   const fittings = await Fitting.find(query)
+    .sort('-scheduledDate')
+    .populate('customer', 'profile.firstName profile.lastName');
+    
+  res.json(fittings);
+});
+
+exports.getAllUserFittings = asyncHandler(async (req, res) => {
+  const fittings = await Fitting.find({ customer: req.user._id })
     .sort('-scheduledDate')
     .populate('customer', 'profile.firstName profile.lastName');
     
@@ -77,18 +84,31 @@ exports.updateFittingStatus = asyncHandler(async (req, res) => {
 exports.getFittingById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  // Validate the ID format
-  if (!id || id === 'all' || id === 'my-fittings') {
-    return res.status(400).json({ message: 'Invalid fitting ID' });
+  // Basic validation
+  if (!id) {
+    return res.status(400).json({ message: 'Fitting ID is required' });
   }
 
-  const fitting = await Fitting.findById(id).populate('customer', 'profile.firstName profile.lastName');
+  try {
+    const fitting = await Fitting.findById(id).populate('customer', 'profile.firstName profile.lastName');
 
-  if (!fitting) {
-    return res.status(404).json({ message: 'Fitting not found' });
+    if (!fitting) {
+      return res.status(404).json({ message: 'Fitting not found' });
+    }
+
+    res.json(fitting);
+  } catch (error) {
+    // Handle potential cast errors
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid fitting ID format' });
+    }
+    
+    // Generic error handler
+    res.status(500).json({ 
+      message: 'Error fetching fitting', 
+      error: error.message 
+    });
   }
-
-  res.json(fitting);
 });
 
 exports.updateFitting = asyncHandler(async (req, res) => {

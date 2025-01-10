@@ -96,4 +96,7 @@ router.put('/:id/cancel', authMiddleware, fittingController.cancelFitting);
 // Get user's fittings with optional type filter
 router.get('/', authMiddleware, fittingController.getUserFittings);
 
+// Get all fittings for the current user
+router.get('/', authMiddleware, fittingController.getUserFittings);
+
 module.exports = router;

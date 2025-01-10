@@ -31,15 +31,23 @@ const FittingsProvider = ({ children }) => {
     }
   );
 
-  // Fetch all fittings
-  const fetchFittings = async () => {
+ // Fetch all fittings
+const fetchFittings = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/fittings/all');
-      setFittings(response.data);
+      const response = await api.get('/fittings');
+      const transformedFittings = response.data.map(fitting => ({
+        ...fitting,
+        scheduledDate: new Date(fitting.scheduledDate),
+        formattedDate: new Date(fitting.scheduledDate).toLocaleDateString(),
+        formattedTime: fitting.time
+      }));
+      setFittings(transformedFittings);
       toast.success('Fittings loaded successfully');
+      return transformedFittings;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to load fittings');
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -94,15 +102,36 @@ const FittingsProvider = ({ children }) => {
     }
   };
 
-  // Get a single fitting by ID
-  const getFittingById = async (id) => {
+  // In FittingsProvider.jsx
+const getFittingById = async (id) => {
     setLoading(true);
     try {
-      const response = await api.get(`/fittings/${id}`);
-      setCurrentFitting(response.data);
-      return response.data;
+      if (!id) {
+        throw new Error('Fitting ID is required');
+      }
+  
+      const trimmedId = String(id).trim();
+  
+      const response = await api.get(`/fittings/${trimmedId}`);
+      
+      // Transform the fitting data 
+      const transformedFitting = {
+        ...response.data,
+        scheduledDate: new Date(response.data.scheduledDate),
+        formattedDate: new Date(response.data.scheduledDate).toLocaleDateString(),
+        formattedTime: response.data.time
+      };
+  
+      setCurrentFitting(transformedFitting);
+      return transformedFitting;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to fetch fitting');
+      console.error('Fitting Fetch Error:', error);
+      
+      toast.error(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to fetch fitting'
+      );
       throw error;
     } finally {
       setLoading(false);
