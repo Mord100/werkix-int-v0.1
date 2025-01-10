@@ -26,6 +26,8 @@ import AccountHistory from '../components/AccountHistory';
 import MyProfile from '../components/MyProfile';
 import GetStartedMessage from '../components/admin/GettingStartedMessage';
 import FittingRequests from '../components/admin/FittingRequests';
+import FittingsTasks from '../components/admin/FittingsTasks';
+import FittingSchedule from '../components/admin/FittingSchedule';
 import AdBanner from '../components/AdBanner';
 
 const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
@@ -129,9 +131,9 @@ const Admin = () => {
           ) : viewScheduleSwingAnalysis ? (
             <FittingRequests />
           ) : viewScheduleFitting ? (
-            <ScheduleFitting />
+            <FittingsTasks />
           ) : viewFittingProgress ? (
-            <FittingProgress />
+            <FittingSchedule />
           ) : viewFittingAccountHistory ? (
             <AccountHistory />
           ) : viewFittingMyProfile ? (

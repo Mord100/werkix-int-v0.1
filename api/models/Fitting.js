@@ -24,7 +24,7 @@ const fittingSchema = new mongoose.Schema({
     type: String,
     enum: [
       'Fitting Request Submitted',
-      'Fitting being Prepped',
+      'Fitting Being Prepped',
       'Fitting Scheduled',
       'Fitting Canceled',
       'Fitting Completed'
@@ -36,7 +36,7 @@ const fittingSchema = new mongoose.Schema({
       type: String,
       enum: [
         'Fitting Request Submitted',
-        'Fitting being Prepped',
+        'Fitting Being Prepped',
         'Fitting Scheduled',
         'Fitting Canceled',
         'Fitting Completed'

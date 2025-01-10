@@ -31,7 +31,7 @@ router.put('/:id',
   authMiddleware.isAdmin,
   [
     check('type').isIn(['swing-analysis', 'club-fitting']),
-    body('date').custom(isValidDate),
+
     check('comments').optional().isString(),
     check('time').optional().isString(),
     check('clubType').optional().isString()
@@ -41,31 +41,17 @@ router.put('/:id',
 );
 
 router.post('/request',
-    authMiddleware,
-    [
-      check('type').isIn(['swing-analysis', 'club-fitting']),
-      body('date').custom(isValidDate),
-      check('comments').optional().isString(),
-      check('time').optional().isString(),
-      check('clubType').optional().isString()
-    ],
-    validateRequest,
-    fittingController.createFittingRequest
-  );
-  
-  router.put('/:id',
-    authMiddleware,
-    authMiddleware.isAdmin,
-    [
-      check('type').isIn(['swing-analysis', 'club-fitting']),
-      body('date').custom(isValidDate),
-      check('comments').optional().isString(),
-      check('time').optional().isString(),
-      check('clubType').optional().isString()
-    ],
-    validateRequest,
-    fittingController.updateFitting
-  );
+  authMiddleware,
+  [
+    check('type').isIn(['swing-analysis', 'club-fitting']),
+    body('date').custom(isValidDate),
+    check('comments').optional().isString(),
+    check('time').optional().isString(),
+    check('clubType').optional().isString()
+  ],
+  validateRequest,
+  fittingController.createFittingRequest
+);
 
 router.get('/:id', 
   authMiddleware, 
@@ -77,7 +63,7 @@ router.put('/:id',
   authMiddleware.isAdmin,
   [
     check('type').isIn(['swing-analysis', 'club-fitting']),
-    check('scheduledDate').isDate(),
+    body('date').custom(isValidDate),
     check('comments').optional().isString()
   ],
   validateRequest,

@@ -8,8 +8,7 @@ const FittingsProvider = ({ children }) => {
   const [fittings, setFittings] = useState([]);
   const [currentFitting, setCurrentFitting] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [cookies] = useCookies(['token', 'role']);
-  const userRole = cookies.role;
+  const [cookies] = useCookies(['token']);
 
   // axios instance with interceptors for authorization
   const api = axios.create({
@@ -32,17 +31,8 @@ const FittingsProvider = ({ children }) => {
     }
   );
 
-  // Admin-only methods
-  const adminOnlyAction = (action) => {
-    if (userRole !== 'admin') {
-      toast.error('Access denied. Admin rights required.');
-      throw new Error('Admin access required');
-    }
-    return action();
-  };
-
-  // Fetch all fittings (admin can see all)
-  const fetchFittings = async () => {
+ // Fetch all fittings
+const fetchFittings = async () => {
     setLoading(true);
     try {
       const response = await api.get('/fittings');
@@ -63,114 +53,104 @@ const FittingsProvider = ({ children }) => {
     }
   };
 
-  // Create a new fitting (admin can create on behalf of users)
+  // Create a new fitting
   const createFitting = async (fittingData) => {
-    return adminOnlyAction(async () => {
-      setLoading(true);
-      try {
-        const response = await api.post('/fittings', fittingData);
-        setFittings([...fittings, response.data]);
-        toast.success('Fitting created successfully');
-        return response.data;
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to create fitting');
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    });
+    setLoading(true);
+    try {
+      const response = await api.post('/fittings', fittingData);
+      setFittings([...fittings, response.data]);
+      toast.success('Fitting created successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to create fitting');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Update an existing fitting (admin can update any fitting)
+  // Update an existing fitting
   const updateFitting = async (id, fittingData) => {
-    return adminOnlyAction(async () => {
-      setLoading(true);
-      try {
-        const response = await api.put(`/fittings/${id}`, fittingData);
-        setFittings(fittings.map(fitting => 
-          fitting._id === id ? response.data : fitting
-        ));
-        toast.success('Fitting updated successfully');
-        return response.data;
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to update fitting');
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    });
+    setLoading(true);
+    try {
+      const response = await api.put(`/fittings/${id}`, fittingData);
+      setFittings(fittings.map(fitting => 
+        fitting._id === id ? response.data : fitting
+      ));
+      toast.success('Fitting updated successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update fitting');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Delete a fitting (admin-only action)
+  // Delete a fitting
   const deleteFitting = async (id) => {
-    return adminOnlyAction(async () => {
-      setLoading(true);
-      try {
-        await api.delete(`/fittings/${id}`);
-        setFittings(fittings.filter(fitting => fitting._id !== id));
-        toast.success('Fitting deleted successfully');
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to delete fitting');
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    });
+    setLoading(true);
+    try {
+      await api.delete(`/fittings/${id}`);
+      setFittings(fittings.filter(fitting => fitting._id !== id));
+      toast.success('Fitting deleted successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete fitting');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Get fitting by ID (admin can access any fitting)
-  const getFittingById = async (id) => {
-    return adminOnlyAction(async () => {
-      setLoading(true);
-      try {
-        if (!id) {
-          throw new Error('Fitting ID is required');
-        }
-    
-        const trimmedId = String(id).trim();
-    
-        const response = await api.get(`/fittings/${trimmedId}`);
-        
-        // Transform the fitting data 
-        const transformedFitting = {
-          ...response.data,
-          scheduledDate: new Date(response.data.scheduledDate),
-          formattedDate: new Date(response.data.scheduledDate).toLocaleDateString(),
-          formattedTime: response.data.time
-        };
-    
-        setCurrentFitting(transformedFitting);
-        return transformedFitting;
-      } catch (error) {
-        console.error('Fitting Fetch Error:', error);
-        
-        toast.error(
-          error.response?.data?.message || 
-          error.message || 
-          'Failed to fetch fitting'
-        );
-        throw error;
-      } finally {
-        setLoading(false);
+  // In FittingsProvider.jsx
+const getFittingById = async (id) => {
+    setLoading(true);
+    try {
+      if (!id) {
+        throw new Error('Fitting ID is required');
       }
-    });
+  
+      const trimmedId = String(id).trim();
+  
+      const response = await api.get(`/fittings/${trimmedId}`);
+      
+      // Transform the fitting data 
+      const transformedFitting = {
+        ...response.data,
+        scheduledDate: new Date(response.data.scheduledDate),
+        formattedDate: new Date(response.data.scheduledDate).toLocaleDateString(),
+        formattedTime: response.data.time
+      };
+  
+      setCurrentFitting(transformedFitting);
+      return transformedFitting;
+    } catch (error) {
+      console.error('Fitting Fetch Error:', error);
+      
+      toast.error(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to fetch fitting'
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Schedule a fitting (admin can schedule for any user)
+  // Schedule a fitting
   const scheduleFitting = async (scheduleData) => {
-    return adminOnlyAction(async () => {
-      setLoading(true);
-      try {
-        const response = await api.post('/fittings/request', scheduleData);
-        toast.success('Fitting scheduled successfully');
-        return response.data;
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to schedule fitting');
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    });
+    setLoading(true);
+    try {
+      const response = await api.post('/fittings/request', scheduleData);
+      toast.success('Fitting scheduled successfully');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to schedule fitting');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Fetch fittings on component mount
@@ -185,7 +165,6 @@ const FittingsProvider = ({ children }) => {
       fittings,
       currentFitting,
       loading,
-      userRole,
       fetchFittings,
       createFitting,
       updateFitting,
