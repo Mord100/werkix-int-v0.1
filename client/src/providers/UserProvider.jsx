@@ -6,7 +6,6 @@ import { toast } from 'react-hot-toast';
 
 export const useUser = () => useContext(UserContext);
 
-
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); 
   const [users, setUsers] = useState([]); 
@@ -20,18 +19,22 @@ const UserProvider = ({ children }) => {
     }
   }, [cookies.token]);
 
+  // Fetch Users Method
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:3000/api/user');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error.message);
+      toast.error('Failed to fetch users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial fetch on provider mount
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('http://localhost:3000/api/user');
-        setUsers(response.data);
-      } catch (error) {
-        console.error('Failed to fetch users:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
   }, []);
 
@@ -62,13 +65,14 @@ const UserProvider = ({ children }) => {
     setUser(null);
   };
 
-  const createUser = async (name, email, password, role) => {
+  const createUser = async (userData) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/api/user', { name, email, password, role });
+      const response = await axios.post('http://localhost:3000/api/user', userData);
       
       setUsers([...users, response.data]);
       toast.success('User created successfully');
+      return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to create user');
       throw error;
@@ -77,13 +81,14 @@ const UserProvider = ({ children }) => {
     }
   };
 
-  const updateUser = async (id, name, email, password, role) => {
+  const updateUser = async (id, userData) => {
     setLoading(true);
     try {
-      const response = await axios.put(`http://localhost:3000/api/user/${id}`, { name, email, password, role });
+      const response = await axios.put(`http://localhost:3000/api/user/${id}`, userData);
       
       setUsers(users.map(user => user._id === id ? response.data : user));
       toast.success('User updated successfully');
+      return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update user');
       throw error;
@@ -92,8 +97,33 @@ const UserProvider = ({ children }) => {
     }
   };
 
+  const deleteUser = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`http://localhost:3000/api/user/${id}`);
+      
+      setUsers(users.filter(user => user._id !== id));
+      toast.success('User deleted successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete user');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, users, login, logout, createUser, updateUser, loading }}>
+    <UserContext.Provider value={{ 
+      user, 
+      users, 
+      login, 
+      logout, 
+      createUser, 
+      updateUser, 
+      deleteUser,
+      fetchUsers, 
+      loading 
+    }}>
       {children}
     </UserContext.Provider>
   );

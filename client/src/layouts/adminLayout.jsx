@@ -12,6 +12,11 @@ import { LuFileText } from "react-icons/lu";
 import { GrScheduleNew } from "react-icons/gr";
 import { MdTimeline } from "react-icons/md";
 import { VscDebugStart } from "react-icons/vsc";
+import { FaTasks } from "react-icons/fa";
+import { MdListAlt } from "react-icons/md";
+import { FaUsersCog } from "react-icons/fa";
+
+
 
 
 
@@ -28,6 +33,8 @@ import GetStartedMessage from '../components/admin/GettingStartedMessage';
 import FittingRequests from '../components/admin/FittingRequests';
 import FittingsTasks from '../components/admin/FittingsTasks';
 import FittingSchedule from '../components/admin/FittingSchedule';
+import FittingHistory from '../components/admin/FittingHistory';
+import CustomerProfiles from '../components/admin/CustomerProfiles';
 import AdBanner from '../components/AdBanner';
 
 const MenuItem = ({ icon: Icon, label, active = false, onClick }) => (
@@ -88,11 +95,11 @@ const Admin = () => {
           {[
             { icon: RiDashboardLine, label: 'Home' },
             { icon: VscDebugStart, label: 'Getting Started Message' },
-            { icon: RiCalendarEventLine, label: 'Fitting Requests' },
-            { icon: GrScheduleNew, label: 'Fitting Tasks' },
-            { icon: MdTimeline, label: 'Fitting Schedule' },
+            { icon: MdListAlt, label: 'Fitting Requests' },
+            { icon: FaTasks, label: 'Fitting Tasks' },
+            { icon: GrScheduleNew, label: 'Fitting Schedule' },
             { icon: LuFileText, label: 'Fitting History' },
-            { icon: RiUser3Line, label: 'Customer Profiles' },
+            { icon: FaUsersCog, label: 'Customer Profiles' },
           ].map((item) => (
             <MenuItem
               key={item.label}
@@ -135,9 +142,9 @@ const Admin = () => {
           ) : viewFittingProgress ? (
             <FittingSchedule />
           ) : viewFittingAccountHistory ? (
-            <AccountHistory />
+            <FittingHistory />
           ) : viewFittingMyProfile ? (
-            <MyProfile />
+            <CustomerProfiles />
           ) : (
             <>
               <Dashboard />
