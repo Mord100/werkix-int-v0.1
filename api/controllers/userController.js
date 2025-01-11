@@ -10,7 +10,7 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, phone, address, password, role } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -21,6 +21,8 @@ exports.createUser = async (req, res) => {
       name,
       email,
       password,
+      phone,
+      address,
       role
     });
 

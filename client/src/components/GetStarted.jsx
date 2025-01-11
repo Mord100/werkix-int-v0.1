@@ -1,9 +1,14 @@
 import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import ContentContext from '../context/ContentContext'
+import { useEffect } from 'react'
 
 const Banner = () => {
-  const { bannerContent } = useContext(ContentContext);
+  const { bannerContent, getBannerContent } = useContext(ContentContext);
+
+  useEffect(() => {
+    getBannerContent();
+  }, []);
 
   return (
     <div className="bg-gradient-to-r p-8 mx-5 mt-5 rounded-md from-blue-500 to-gray-900 text-white py-16">

@@ -6,6 +6,8 @@ import UserContext from '../context/UserContext';
 const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   
   const navigate = useNavigate();
@@ -15,7 +17,14 @@ const SignUp = () => {
     e.preventDefault();
     
     try {
-      await createUser(name, email, password, 'consumer');
+      await createUser({
+        name,
+        email, 
+        password,
+        phone,
+        address,
+        role: 'consumer'
+      });
       
       // Redirect to login page after successful signup
       navigate('/login');
@@ -26,7 +35,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen  bg-gray-100">
       <button
         onClick={() => navigate('/')}
         className="absolute top-0 left-0 m-8 hover:underline text-gray-900 flex gap-1 items-center text-left"
@@ -34,7 +43,7 @@ const SignUp = () => {
         <RiArrowLeftSLine size={20} />
         Back
       </button>
-      <div className="w-[50%] p-8 bg-white rounded-lg shadow-lg">
+      <div className="w-[50%] p-8 bg-white rounded-lg max-h-[90vh] overflow-y-auto shadow-lg">
         <h2 className="text-3xl font-bold mb-2 text-center text-gray-800">
           Create an Account
         </h2>
@@ -59,11 +68,37 @@ const SignUp = () => {
             <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
             <input
               id="email"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Enter email"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="number" className="text-sm font-medium text-gray-700">Phone</label>
+            <input
+              id="number"
+              type="number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Enter Phone Number"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="address" className="text-sm font-medium text-gray-700">Address</label>
+            <input
+              id="address"
+              type="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Enter Address"
               required
             />
           </div>
