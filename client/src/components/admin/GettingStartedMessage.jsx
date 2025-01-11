@@ -1,31 +1,39 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { RiEditLine, RiSaveLine, RiCloseLine } from 'react-icons/ri';
 import { toast } from 'react-hot-toast';
-import UserContext from '../../context/UserContext';
+import ContentContext from '../../context/ContentContext';
 
 const GettingStartedMessage = () => {
-  const { user, updateBannerContent, getBannerContent } = useContext(UserContext);
+  const { 
+    bannerContent: contextBannerContent, 
+    updateBannerContent, 
+    getBannerContent,
+    loading 
+  } = useContext(ContentContext);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [bannerContent, setBannerContent] = useState({
     title: 'Golf Club Fitting',
     description: 'Welcome to Golf Club Fitting - Your one-stop solution for all your golf needs. We offer a wide range of products and services to help you play better, stay healthier, and enjoy your time on the golf course.'
   });
 
+  // Sync local state with context
+  useEffect(() => {
+    setBannerContent(contextBannerContent);
+  }, [contextBannerContent]);
+
   // Fetch existing banner content on component mount
   useEffect(() => {
     const fetchBannerContent = async () => {
       try {
-        const content = await getBannerContent();
-        if (content) {
-          setBannerContent(content);
-        }
+        await getBannerContent();
       } catch (error) {
         console.error('Failed to fetch banner content:', error);
       }
     };
 
     fetchBannerContent();
-  }, [getBannerContent]);
+  }, []);
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -50,6 +58,7 @@ const GettingStartedMessage = () => {
 
   // Cancel editing
   const handleCancelEdit = () => {
+    setBannerContent(contextBannerContent);
     setIsEditing(false);
   };
 
@@ -64,6 +73,7 @@ const GettingStartedMessage = () => {
             <button 
               onClick={() => setIsEditing(true)}
               className="flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-md hover:bg-blue-200"
+              disabled={loading}
             >
               <RiEditLine className="mr-2" /> Edit Banner
             </button>
@@ -72,12 +82,14 @@ const GettingStartedMessage = () => {
               <button 
                 onClick={handleCancelEdit}
                 className="flex items-center bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+                disabled={loading}
               >
                 <RiCloseLine className="mr-2" /> Cancel
               </button>
               <button 
                 onClick={handleSaveBanner}
                 className="flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200"
+                disabled={loading}
               >
                 <RiSaveLine className="mr-2" /> Save Changes
               </button>
@@ -98,6 +110,7 @@ const GettingStartedMessage = () => {
                   onChange={handleInputChange}
                   placeholder="Enter banner title"
                   className="w-full text-4xl font-light mb-4 bg-transparent border-b border-white/50 focus:outline-none"
+                  disabled={loading}
                 />
                 <textarea
                   name="description"
@@ -106,6 +119,7 @@ const GettingStartedMessage = () => {
                   placeholder="Enter banner description"
                   className="w-full text-lg mb-6 bg-transparent border border-white/50 rounded-md p-2 focus:outline-none"
                   rows="4"
+                  disabled={loading}
                 />
               </>
             ) : (

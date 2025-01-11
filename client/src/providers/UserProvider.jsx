@@ -10,38 +10,72 @@ const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); 
   const [users, setUsers] = useState([]); 
   const [loading, setLoading] = useState(false); 
-  const [cookies, setCookie, removeCookie] = useCookies(['token']); // Use cookies for token storage
+  const [cookies, setCookie, removeCookie] = useCookies(['token', 'role']); // Use cookies for token and role storage
+
+  // Create axios instance with interceptors
+  const api = axios.create({
+    baseURL: 'http://localhost:3000/api',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  // Request interceptor to add token to every request
+  api.interceptors.request.use(
+    (config) => {
+      if (cookies.token) {
+        config.headers['Authorization'] = `Bearer ${cookies.token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   useEffect(() => {
     // Check if token exists in cookies and set user state accordingly
     if (cookies.token) {
-      setUser({ token: cookies.token });
+      setUser({ 
+        token: cookies.token,
+        role: cookies.role 
+      });
     }
-  }, [cookies.token]);
+  }, [cookies.token, cookies.role]);
 
-  // Fetch Users Method
+  // Fetch Users Method (Admin only)
   const fetchUsers = async () => {
+    // Check if user is an admin using cookie role
+    if (cookies.role !== 'admin') {
+      toast.error('Access denied. Admin rights required.');
+      return [];
+    }
+
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:3000/api/user');
+      const response = await api.get('/user');
       setUsers(response.data);
+      return response.data;
     } catch (error) {
       console.error('Failed to fetch users:', error.message);
-      toast.error('Failed to fetch users');
+      toast.error(error.response?.data?.message || 'Failed to fetch users');
+      return [];
     } finally {
       setLoading(false);
     }
   };
 
-  // Initial fetch on provider mount
+  // Initial fetch on provider mount (only for admin)
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (cookies.role === 'admin') {
+      fetchUsers();
+    }
+  }, [cookies.role, cookies.token]);
 
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/api/user/login', { email, password });
+      const response = await api.post('/user/login', { email, password });
       
       // Set token and role in cookies
       setCookie('token', response.data.token, { path: '/' });
@@ -68,7 +102,7 @@ const UserProvider = ({ children }) => {
   const createUser = async (userData) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/api/user', userData);
+      const response = await api.post('/user', userData);
       
       setUsers([...users, response.data]);
       toast.success('User created successfully');
@@ -84,7 +118,7 @@ const UserProvider = ({ children }) => {
   const updateUser = async (id, userData) => {
     setLoading(true);
     try {
-      const response = await axios.put(`http://localhost:3000/api/user/${id}`, userData);
+      const response = await api.put(`/user/${id}`, userData);
       
       setUsers(users.map(user => user._id === id ? response.data : user));
       toast.success('User updated successfully');
@@ -100,7 +134,7 @@ const UserProvider = ({ children }) => {
   const deleteUser = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:3000/api/user/${id}`);
+      await api.delete(`/user/${id}`);
       
       setUsers(users.filter(user => user._id !== id));
       toast.success('User deleted successfully');

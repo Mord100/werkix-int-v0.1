@@ -10,7 +10,7 @@ import FittingsContext from '../context/FittingsContext';
 import { toast } from 'react-hot-toast';
 
 const AccountHistory = () => {
-  const { fittings } = useContext(FittingsContext);
+  const { fittings, fetchFittings } = useContext(FittingsContext);
   const [filteredFittings, setFilteredFittings] = useState(fittings);
   const [filterStatus, setFilterStatus] = useState('All');
   const [sortOrder, setSortOrder] = useState('desc');
@@ -63,6 +63,10 @@ const AccountHistory = () => {
 
     setFilteredFittings(result);
   }, [fittings, filterStatus, sortOrder]);
+
+  useEffect (() => {
+    fetchFittings();
+  }, []);
 
   // Render fitting status with icon
   const renderStatusWithIcon = (status) => {

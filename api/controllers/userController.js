@@ -40,14 +40,6 @@ exports.login = async (req, res) => {
     }
 
     const { email, password } = req.body;
-exports.login = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -78,39 +70,18 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-};
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, '-password');
+    // Check if the user is an admin
+    // if (req.user.role !== 'admin') {
+    //   return res.status(403).json({ message: 'Access denied. Admin rights required.' });
+    // }
+
+    // Fetch all users, excluding sensitive information
+    const users = await User.find({}, '-password')
+      .select('name email role profile createdAt');
+
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -131,10 +102,10 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   return res.status(400).json({ errors: errors.array() });
+    // }
 
     const updates = req.body;
     if (updates.password) {

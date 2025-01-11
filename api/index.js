@@ -9,6 +9,7 @@ const errorHandler = require('./middleware/errorHandler');
 const userRoutes = require('./routes/user');
 const fittingRoutes = require('./routes/fittings');
 const scheduleRoutes = require('./routes/schedule');
+const contentRoutes = require('./routes/content');
 
 const PORT = process.env.PORT || 3001;
 
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use('/api/user', userRoutes);
 app.use('/api/fittings', fittingRoutes);
 app.use('/api/schedule', scheduleRoutes);
+app.use('/api/content', contentRoutes);
 
 // Handle undefined routes
 app.use('*', (req, res) => {

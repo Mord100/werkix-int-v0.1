@@ -4,7 +4,6 @@ import {
   RiMailLine, 
   RiPhoneLine,
   RiMapPinLine,
-//   RiGolfLine,
   RiEditLine,
   RiSaveLine
 } from 'react-icons/ri';
@@ -14,7 +13,7 @@ import UserContext from '../context/UserContext';
 import { toast } from 'react-hot-toast';
 
 const MyProfile = () => {
-  const { user, updateUserProfile } = useContext(UserContext);
+  const { user, updateUser } = useContext(UserContext);
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     name: '',
@@ -38,9 +37,9 @@ const MyProfile = () => {
       setProfileData({
         name: user.name || '',
         email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || '',
-        golfClubSize: user.golfClubSize || ''
+        phone: user.profile?.phone || '',
+        address: user.profile?.address || '',
+        golfClubSize: user.profile?.golfClubSize || ''
       });
     }
   }, [user]);
@@ -57,7 +56,14 @@ const MyProfile = () => {
   // Handle profile update
   const handleUpdateProfile = async () => {
     try {
-      await updateUserProfile(profileData);
+      await updateUser(user.id, {
+        name: profileData.name,
+        profile: {
+          phone: profileData.phone,
+          address: profileData.address,
+          golfClubSize: profileData.golfClubSize
+        }
+      });
       toast.success('Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
@@ -94,6 +100,11 @@ const MyProfile = () => {
       </div>
     );
   };
+
+  // Don't render if no user is logged in
+  if (!user) {
+    return <div>Please log in to view your profile</div>;
+  }
 
   return (
     <div className="max-w-7xl my-5 mx-6 p-6 bg-white rounded-lg shadow-md">

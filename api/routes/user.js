@@ -22,9 +22,9 @@ router.post('/login',
   userController.login
 );
 
-router.get('/', authMiddleware, userController.getAllUsers);
+router.get('/',  userController.getAllUsers);
 router.get('/:id', authMiddleware, userController.getUserById);
-router.put('/:id', authMiddleware, userController.updateUser);
+router.put('/:id',  userController.updateUser);
 router.post('/change-password', authMiddleware, userController.changePassword);
 router.delete('/:id', authMiddleware, userController.deleteUser);
 
