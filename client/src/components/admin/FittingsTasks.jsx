@@ -187,9 +187,9 @@ const FittingsTasks = () => {
               >
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-gray-800">{fitting.customerName}</span>
-                  <span className="text-sm text-gray-500">{fitting.type} Fitting</span>
+                  <span className="text-md text-gray-600">{fitting.type} Fitting</span>
                 </div>
-                <div className="text-xs text-gray-400 mt-1">{fitting.status}</div>
+                <div className="text-md text-gray-500 mt-1">{fitting.status}</div>
               </div>
             ))}
           </div>

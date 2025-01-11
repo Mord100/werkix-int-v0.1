@@ -1,11 +1,12 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
 import { 
   RiUserLine, 
   RiEditLine, 
   RiSearchLine, 
   RiAddLine,
   RiDeleteBinLine,
-  RiCloseLine
+  RiCloseLine,
+  RiArrowUpDownLine
 } from 'react-icons/ri';
 import UserContext from '../../context/UserContext';
 
@@ -15,6 +16,11 @@ const CustomerProfiles = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortConfig, setSortConfig] = useState({
+    key: 'name',
+    direction: 'asc'
+  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,6 +37,29 @@ const CustomerProfiles = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  const processedUsers = useMemo(() => {
+    let result = [...users];
+
+    // Search filter
+    if (searchTerm) {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      result = result.filter(user => 
+        user.name?.toLowerCase().includes(lowerSearchTerm) ||
+        user.email?.toLowerCase().includes(lowerSearchTerm)
+      );
+    }
+
+    // Sorting
+    return result.sort((a, b) => {
+      const valueA = a[sortConfig.key] || '';
+      const valueB = b[sortConfig.key] || '';
+      
+      return sortConfig.direction === 'asc'
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    });
+  }, [users, searchTerm, sortConfig]);
 
   const startEditing = (user) => {
     setSelectedUser(user);
@@ -71,27 +100,14 @@ const CustomerProfiles = () => {
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const formFields = [
-    { name: 'name', label: 'Full Name', type: 'text', required: true },
-    { name: 'email', label: 'Email', type: 'email', required: true },
-    { name: 'phone', label: 'Phone Number', type: 'tel' },
-    { name: 'address', label: 'Address', type: 'text' },
-    { name: 'golfClubSize', label: 'Golf Club Size', type: 'text' }
-  ];
-
   const renderUserForm = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-md p-6 transform transition-all">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold text-gray-800">
             {isEditing ? 'Edit Profile' : 'New Customer'}
           </h3>
-          <button
+          <button 
             onClick={() => {
               setIsEditing(false);
               setIsCreating(false);
@@ -107,18 +123,18 @@ const CustomerProfiles = () => {
           e.preventDefault();
           saveUserChanges();
         }}>
-          <div className="space-y-4">
-            {formFields.map(field => (
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              { name: 'name', label: 'Full Name', type: 'text', required: true },
+              { name: 'email', label: 'Email', type: 'email', required: true },
+              { name: 'phone', label: 'Phone Number', type: 'tel' },
+              { name: 'address', label: 'Address', type: 'text' },
+              { name: 'golfClubSize', label: 'Golf Club Size', type: 'text' }
+            ].map(field => (
               <div key={field.name}>
-                <label 
-                  htmlFor={field.name} 
-                  className="block text-sm font-medium text-gray-600 mb-1"
-                >
-                  {field.label}
-                </label>
+                <div className="text-sm text-gray-500 mb-1">{field.label}</div>
                 <input
                   type={field.type}
-                  id={field.name}
                   name={field.name}
                   value={formData[field.name]}
                   onChange={handleInputChange}
@@ -143,63 +159,90 @@ const CustomerProfiles = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="flex flex-col space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <RiUserLine className="w-8 h-8 text-blue-500" />
-              <h1 className="text-2xl font-semibold text-gray-800">
-                Customers
-              </h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input 
-                  type="text"
-                  placeholder="Search customers..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-64 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+    <div className="min-h-screen bg-gray-50/50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <RiUserLine className="w-8 h-8 text-blue-500" />
+                <h1 className="text-2xl font-semibold text-gray-800">
+                  Customers
+                </h1>
               </div>
               
-              <button
-                onClick={() => {
-                  setIsCreating(true);
-                  setFormData({
-                    name: '',
-                    email: '',
-                    phone: '',
-                    address: '',
-                    golfClubSize: ''
-                  });
-                }}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                <RiAddLine />
-                <span>Add Customer</span>
-              </button>
+              <div className="flex-1 flex items-center gap-3">
+                <div className="relative flex-1 max-w-md">
+                  <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input 
+                    type="text"
+                    placeholder="Search customers..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                  />
+                </div>
+                
+                <button
+                  onClick={() => {
+                    setIsCreating(true);
+                    setFormData({
+                      name: '',
+                      email: '',
+                      phone: '',
+                      address: '',
+                      golfClubSize: ''
+                    });
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <RiAddLine className="w-5 h-5" />
+                  <span>Add Customer</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Name</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Email</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600">Phone</th>
-                    <th className="text-right px-6 py-4 text-sm font-semibold text-gray-600">Actions</th>
+                    {[
+                      { key: 'name', label: 'Name' },
+                      { key: 'email', label: 'Email' },
+                      { key: 'phone', label: 'Phone' }
+                    ].map(({ key, label }) => (
+                      <th 
+                        key={key}
+                        onClick={() => {
+                          setSortConfig(prev => ({
+                            key,
+                            direction: prev.key === key && prev.direction === 'asc' 
+                              ? 'desc' 
+                              : 'asc'
+                          }));
+                        }}
+                        className="px-6 py-4 text-left text-sm font-semibold text-gray-600 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          {label}
+                          <RiArrowUpDownLine 
+                            className={`
+                              w-4 h-4 text-gray-400
+                              ${sortConfig.key === key ? 'text-blue-500' : ''}
+                            `}
+                          />
+                        </div>
+                      </th>
+                    ))}
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map(user => (
+                  {processedUsers.map(user => (
                     <tr 
-                      key={user._id} 
+                      key={user._id}
                       className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors"
                     >
                       <td className="px-6 py-4">
@@ -211,15 +254,15 @@ const CustomerProfiles = () => {
                         <div className="flex justify-end space-x-3">
                           <button
                             onClick={() => startEditing(user)}
-                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                            className="text-blue-600 hover:text-blue-700 font-medium"
                           >
-                            <RiEditLine className="w-5 h-5" />
+                            Edit
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user._id)}
-                            className="text-gray-400 hover:text-red-500 transition-colors"
+                            className="text-red-600 hover:text-red-700 font-medium"
                           >
-                            <RiDeleteBinLine className="w-5 h-5" />
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -228,9 +271,9 @@ const CustomerProfiles = () => {
                 </tbody>
               </table>
               
-              {filteredUsers.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">No customers found</p>
+              {processedUsers.length === 0 && (
+                <div className="text-center py-10 text-gray-500">
+                  No customers found matching your criteria.
                 </div>
               )}
             </div>
