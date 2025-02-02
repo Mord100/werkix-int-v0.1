@@ -152,8 +152,7 @@ npm start
 ### Key Pages
 - `Home`: Landing and dashboard
 - Authentication pages
-- Performance tracking pages
-
+- Consumer & Admin Layouts
 ## 🔐 Authentication Flow
 
 1. User registers with name, email, password
@@ -182,8 +181,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📞 Contact
 
-Project Maintainer: [Your Name]
-Email: your.email@example.com
+Project Maintainer: Mord100
+Email: chingolo265@gmail.com
 
 Project Link: [https://github.com/Mord100/werkix-int](https://github.com/Mord100/werkix-int)
 
