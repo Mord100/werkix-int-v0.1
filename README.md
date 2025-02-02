@@ -16,7 +16,7 @@
 
 ## 🌟 Project Overview
 
-Werkix is a comprehensive web application designed for interactive performance tracking and analysis. The platform focuses on providing detailed insights into user performance, with robust features for data management and user interaction.
+A comprehensive web application designed for interactive performance tracking and analysis. The platform focuses on providing detailed insights into user performance, with robust features for data management and user interaction.
 
 ## 🚀 Technology Stack
 
@@ -109,7 +109,7 @@ npm run dev
 2. Start frontend client
 ```bash
 cd ../client
-npm start
+npm run dev
 ```
 
 ### Production Build
